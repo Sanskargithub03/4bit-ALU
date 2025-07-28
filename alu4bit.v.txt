@@ -1,33 +1,20 @@
-module alubit_test;
-  reg [3:0] a,b;
-  reg [2:0] opcode;
-  wire cout, zero;
-  wire [3:0] result;
-  alubit uut(
-    .a(a),
-    .b(b),
-    .opcode(opcode),
-    .zero(zero),
-    .result(result),
-    .cout(cout)
-  );
-  initial begin
-    $dumpfile("dump.vcd");
-    $dumpvars(0,alubit_test);
-  end
-  initial begin
-    $monitor("Time=%0t|a=%b,b=%b,cout=%b,result=%b,opcode=%b,zero=%b",$time,a,b,cout,result,opcode,zero);
-  
-  
-    a=4'b0101;b=4'b0011;
-    opcode=3'b000;#10;
-    opcode=3'b001;#10;
-    opcode=3'b010;#10;
-    opcode=3'b011;#10;
-    opcode=3'b100;#10;
-    opcode=3'b101;#10;
-    a=4'b1111;b=4'b1111;opcode=3'b101;
-    #10;
-    $finish;
-  end
+module alubit(result,cout,a,b,opcode,zero);
+  input[3:0] a,b;
+  input [2:0] opcode;
+  output reg [3:0] result;
+  output reg cout;
+  output reg zero;
+  always @(*) begin
+    cout=0;
+    case(opcode)
+      3'b000:begin {cout,result} = a+b;end
+      3'b001:begin{cout,result} = a-b;end
+      3'b010:begin{cout,result} = a&b;end
+      3'b011:begin{cout,result} = a|b;end
+      3'b100:begin{cout,result} = a^b;end
+      3'b101:begin result=(a==b) ? 4'b0001:4'b0000;end
+        default:result=4'b0000;
+    endcase
+    zero=(result==4'b0000) ? 1:0;
+  end 
 endmodule
